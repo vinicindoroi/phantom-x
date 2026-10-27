@@ -1,179 +1,222 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Logo } from "@/components/ui/Logo";
-import { User, Bot, FileText, CheckCircle } from "lucide-react";
+import {
+  UserCheck,
+  ShieldAlert,
+  ArrowRight,
+  Zap,
+  Lock,
+  Globe2,
+  CheckCircle2,
+  Cpu,
+  Fingerprint,
+} from "lucide-react";
 
 export const RoutingDiagram: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<"all" | "human" | "bot">("all");
+
   return (
-    <div className="relative w-full max-w-4xl mx-auto py-10 px-4 select-none font-sans">
-      {/* SVG Connecting Curved Wires with Animated Energy Pulses (Monochromatic Black & White) */}
-      <svg
-        className="absolute inset-0 w-full h-full pointer-events-none z-10"
-        viewBox="0 0 800 280"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          {/* Monochromatic Gradients for Glowing Wires */}
-          <linearGradient id="userFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
-            <stop offset="60%" stopColor="#ffffff" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="1" />
-          </linearGradient>
+    <div className="relative w-full max-w-5xl mx-auto py-8 px-4 select-none font-sans">
+      {/* Outer Obsidian Frame with Ambient Glow */}
+      <div className="relative rounded-3xl bg-gradient-to-b from-[#12141c]/90 via-[#0a0c10]/95 to-[#020203] border border-white/10 p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden ring-1 ring-white/5">
+        {/* Subtle Ambient Background Gradients */}
+        <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-40 bg-white/[0.04] rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 left-1/4 w-80 h-40 bg-white/[0.03] rounded-full blur-3xl pointer-events-none" />
 
-          <linearGradient id="botFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#52525b" stopOpacity="0.3" />
-            <stop offset="60%" stopColor="#71717a" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#a1a1aa" stopOpacity="0.9" />
-          </linearGradient>
-
-          <linearGradient id="cleanDestGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
-            <stop offset="40%" stopColor="#ffffff" stopOpacity="0.85" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.3" />
-          </linearGradient>
-
-          <linearGradient id="safeDestGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#a1a1aa" stopOpacity="0.9" />
-            <stop offset="40%" stopColor="#71717a" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#52525b" stopOpacity="0.3" />
-          </linearGradient>
-
-          {/* White Glow Filter */}
-          <filter id="neonGlowWhite" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* 1. Wire: Real User (top left) -> Central Phantom-X */}
-        <path
-          d="M 180 70 C 260 70, 280 140, 340 140"
-          stroke="url(#userFlowGrad)"
-          strokeWidth="2.5"
-          filter="url(#neonGlowWhite)"
-        />
-        {/* Animated Particle: User to Central */}
-        <circle r="4" fill="#ffffff" filter="url(#neonGlowWhite)">
-          <animateMotion
-            path="M 180 70 C 260 70, 280 140, 340 140"
-            dur="2.4s"
-            repeatCount="indefinite"
-          />
-        </circle>
-
-        {/* 2. Wire: Bot / Crawler (bottom left) -> Central Phantom-X */}
-        <path
-          d="M 180 210 C 260 210, 280 140, 340 140"
-          stroke="url(#botFlowGrad)"
-          strokeWidth="2"
-        />
-        {/* Animated Particle: Bot to Central */}
-        <circle r="3.5" fill="#a1a1aa">
-          <animateMotion
-            path="M 180 210 C 260 210, 280 140, 340 140"
-            dur="3.2s"
-            repeatCount="indefinite"
-          />
-        </circle>
-
-        {/* 3. Wire: Central Phantom-X -> Offer Page (top right) */}
-        <path
-          d="M 460 140 C 520 140, 540 70, 620 70"
-          stroke="url(#cleanDestGrad)"
-          strokeWidth="2.5"
-          filter="url(#neonGlowWhite)"
-        />
-        {/* Animated Particle: Central to Offer */}
-        <circle r="4" fill="#ffffff" filter="url(#neonGlowWhite)">
-          <animateMotion
-            path="M 460 140 C 520 140, 540 70, 620 70"
-            dur="2.4s"
-            repeatCount="indefinite"
-          />
-        </circle>
-
-        {/* 4. Wire: Central Phantom-X -> Safe / Verification Page (bottom right) */}
-        <path
-          d="M 460 140 C 520 140, 540 210, 620 210"
-          stroke="url(#safeDestGrad)"
-          strokeWidth="2"
-        />
-        {/* Animated Particle: Central to Safe */}
-        <circle r="3.5" fill="#a1a1aa">
-          <animateMotion
-            path="M 460 140 C 520 140, 540 210, 620 210"
-            dur="3.2s"
-            repeatCount="indefinite"
-          />
-        </circle>
-      </svg>
-
-      {/* HTML Interactive Nodes Layer */}
-      <div className="relative z-20 flex items-center justify-between min-h-[260px] max-w-3xl mx-auto">
-        {/* Left Column: Incoming Traffic Types */}
-        <div className="flex flex-col justify-between h-[210px]">
-          {/* Top Node: Real User */}
-          <div className="flex items-center space-x-3 group">
-            <div className="w-14 h-14 rounded-2xl bg-brand-surface/90 border border-neutral-700/80 p-3 flex items-center justify-center shadow-glow-sm group-hover:border-white/70 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all">
-              <User className="w-6 h-6 text-white" />
+        {/* Header HUD / Ingress Bar */}
+        <div className="flex flex-wrap items-center justify-between pb-6 border-b border-white/10 gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-white">
+              <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+              <span className="font-semibold tracking-wider">PIPELINE DE BORDA PHANTOM-X</span>
             </div>
-            <div className="text-left font-sans">
-              <div className="text-xs font-bold text-white tracking-wide">Visitante Real</div>
-              <div className="text-[10px] text-neutral-400">Humano verificado</div>
-            </div>
+            <span className="text-xs font-mono text-brand-muted hidden sm:inline">
+              Edge Telemetry & Real-Time Filtering
+            </span>
           </div>
 
-          {/* Bottom Node: Bot / Crawler */}
-          <div className="flex items-center space-x-3 group">
-            <div className="w-14 h-14 rounded-2xl bg-brand-surface/90 border border-neutral-800 p-3 flex items-center justify-center shadow-glow-sm group-hover:border-neutral-600 transition-all">
-              <Bot className="w-6 h-6 text-neutral-400" />
-            </div>
-            <div className="text-left font-sans">
-              <div className="text-xs font-bold text-neutral-300 tracking-wide">Bot / Crawler</div>
-              <div className="text-[10px] text-neutral-500">Automação & scrapers</div>
-            </div>
+          {/* Filter Pills */}
+          <div className="flex items-center space-x-1.5 bg-black/60 border border-white/10 p-1 rounded-xl text-xs font-mono">
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`px-3 py-1 rounded-lg transition ${
+                activeTab === "all"
+                  ? "bg-white text-black font-semibold shadow-sm"
+                  : "text-brand-muted hover:text-white"
+              }`}
+            >
+              Fluxo Completo
+            </button>
+            <button
+              onClick={() => setActiveTab("human")}
+              className={`px-3 py-1 rounded-lg transition flex items-center space-x-1 ${
+                activeTab === "human"
+                  ? "bg-white text-black font-semibold shadow-sm"
+                  : "text-brand-muted hover:text-white"
+              }`}
+            >
+              <span>Visitante Real</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("bot")}
+              className={`px-3 py-1 rounded-lg transition flex items-center space-x-1 ${
+                activeTab === "bot"
+                  ? "bg-white text-black font-semibold shadow-sm"
+                  : "text-brand-muted hover:text-white"
+              }`}
+            >
+              <span>Crawlers & Bots</span>
+            </button>
           </div>
         </div>
 
-        {/* Center Node: Phantom-X Core Logo Engine (Enlarged, Pure Black & White, No "Motor de Borda") */}
-        <div className="relative flex flex-col items-center justify-center">
-          {/* Outer glowing white aura */}
-          <div className="absolute w-36 h-36 rounded-full bg-white/10 blur-2xl animate-pulse pointer-events-none" />
+        {/* 3-Stage Pipeline: Ingress -> Central Neural Engine -> Outbound Routing */}
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          {/* STAGE 1: INGRESSO MULTI-CANAL (Left 3 cols) */}
+          <div className="lg:col-span-3 space-y-3">
+            <div className="text-[11px] font-mono text-brand-muted uppercase tracking-wider flex items-center space-x-1.5">
+              <Globe2 className="w-3.5 h-3.5 text-white" />
+              <span>1. Origens de Tráfego</span>
+            </div>
 
-          {/* Core Logo Container - Larger & Prominent */}
-          <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-3xl bg-neutral-900/90 border border-white/30 p-1 shadow-[0_0_35px_rgba(255,255,255,0.2)] flex items-center justify-center hover:scale-105 transition-transform duration-300">
-            <div className="w-full h-full rounded-[22px] bg-black/70 backdrop-blur-md border border-white/10 flex items-center justify-center p-3">
-              <Logo size={74} className="filter drop-shadow-[0_0_16px_rgba(255,255,255,0.9)]" />
+            {/* Ingress Card 1: Comprador / Visitante */}
+            <div
+              className={`p-3.5 rounded-2xl border transition-all ${
+                activeTab === "all" || activeTab === "human"
+                  ? "bg-[#10131c] border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                  : "bg-black/40 border-white/5 opacity-40"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-white font-semibold">
+                  TRÁFEGO PAGO
+                </span>
+                <span className="text-[10px] font-mono text-white">4G/5G / WiFi</span>
+              </div>
+              <div className="text-xs font-bold text-white">Visitante Humano Real</div>
+              <div className="text-[11px] text-brand-muted mt-1 leading-snug">
+                Meta Ads, TikTok, Google Search. Dispositivo móvel/desktop residencial.
+              </div>
+            </div>
+
+            {/* Ingress Card 2: Bots / Inspecionadores */}
+            <div
+              className={`p-3.5 rounded-2xl border transition-all ${
+                activeTab === "all" || activeTab === "bot"
+                  ? "bg-[#10131c] border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                  : "bg-black/40 border-white/5 opacity-40"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-neutral-300 font-semibold">
+                  INSPEÇÃO
+                </span>
+                <span className="text-[10px] font-mono text-neutral-400">Datacenter ASN</span>
+              </div>
+              <div className="text-xs font-bold text-neutral-200">Bots & Review Crawlers</div>
+              <div className="text-[11px] text-brand-muted mt-1 leading-snug">
+                Google-InspectionTool, Facebot, ByteSpider, headless scrapers.
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Right Column: Routed Destinations */}
-        <div className="flex flex-col justify-between h-[210px]">
-          {/* Top Node: Clean Offer Destination */}
-          <div className="flex items-center space-x-3 flex-row-reverse space-x-reverse group">
-            <div className="w-14 h-14 rounded-2xl bg-brand-surface/90 border border-neutral-700/80 p-3 flex items-center justify-center shadow-glow-sm group-hover:border-white/70 group-hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] transition-all">
-              <FileText className="w-6 h-6 text-white" />
+          {/* STAGE 2: PHANTOM-X CORE PROCESSOR (Center 6 cols) */}
+          <div className="lg:col-span-6 relative flex flex-col items-center justify-center p-6 rounded-3xl bg-black/60 border border-white/15 shadow-inner">
+            {/* Animated Radar Concentric Circles */}
+            <div className="absolute w-48 h-48 rounded-full border border-white/10 animate-ping pointer-events-none opacity-20" />
+            <div className="absolute w-64 h-64 rounded-full border border-white/5 pointer-events-none" />
+
+            {/* Central Vault with Logo */}
+            <div className="relative z-10 w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-gradient-to-b from-[#181a24] to-[#08090d] border border-white/30 p-2 shadow-[0_0_40px_rgba(255,255,255,0.18)] flex items-center justify-center group hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-2xl bg-black/80 flex items-center justify-center p-3 border border-white/10">
+                <Logo size={62} className="filter drop-shadow-[0_0_14px_rgba(255,255,255,0.8)]" />
+              </div>
             </div>
-            <div className="text-right font-sans">
-              <div className="text-xs font-bold text-white tracking-wide">Página de Oferta</div>
-              <div className="text-[10px] text-neutral-400">Acesso liberado &lt; 18ms</div>
+
+            {/* Processor Title */}
+            <div className="relative z-10 mt-4 text-center">
+              <span className="font-mono text-sm font-bold text-white tracking-widest uppercase">
+                Motor de Decisão em Borda
+              </span>
+              <p className="text-xs text-brand-secondary mt-0.5 font-sans">
+                Inspeção de Assinatura, ASN e Risco em &lt; 14ms
+              </p>
+            </div>
+
+            {/* Live Real-Time Telemetry Tags */}
+            <div className="relative z-10 mt-4 grid grid-cols-2 gap-2 w-full max-w-sm text-[11px] font-mono">
+              <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <Fingerprint className="w-3.5 h-3.5 text-white shrink-0" />
+                <span className="text-brand-secondary truncate">Click ID Assinado</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <Zap className="w-3.5 h-3.5 text-white shrink-0" />
+                <span className="text-brand-secondary truncate">Latência &lt; 18ms</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <Cpu className="w-3.5 h-3.5 text-white shrink-0" />
+                <span className="text-brand-secondary truncate">ASN IP Filtering</span>
+              </div>
+              <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <Lock className="w-3.5 h-3.5 text-white shrink-0" />
+                <span className="text-brand-secondary truncate">Anti-Open Redirect</span>
+              </div>
             </div>
           </div>
 
-          {/* Bottom Node: Safe Verification Page */}
-          <div className="flex items-center space-x-3 flex-row-reverse space-x-reverse group">
-            <div className="w-14 h-14 rounded-2xl bg-brand-surface/90 border border-neutral-800 p-3 flex items-center justify-center shadow-glow-sm group-hover:border-neutral-600 transition-all">
-              <CheckCircle className="w-6 h-6 text-neutral-400" />
+          {/* STAGE 3: DESTINOS AUTORIZADOS (Right 3 cols) */}
+          <div className="lg:col-span-3 space-y-3">
+            <div className="text-[11px] font-mono text-brand-muted uppercase tracking-wider flex items-center space-x-1.5">
+              <ArrowRight className="w-3.5 h-3.5 text-white" />
+              <span>3. Entrega Determinística</span>
             </div>
-            <div className="text-right font-sans">
-              <div className="text-xs font-bold text-neutral-300 tracking-wide">Página Segura</div>
-              <div className="text-[10px] text-neutral-500">Mitigação / Safe Page</div>
+
+            {/* Destination 1: Página de Oferta (Conversão) */}
+            <div
+              className={`p-3.5 rounded-2xl border transition-all ${
+                activeTab === "all" || activeTab === "human"
+                  ? "bg-[#10131c] border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                  : "bg-black/40 border-white/5 opacity-40"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/15 text-white font-semibold">
+                  ROTA DE OFERTA
+                </span>
+                <span className="text-[10px] font-mono text-white flex items-center space-x-1">
+                  <CheckCircle2 className="w-3 h-3 text-white" />
+                  <span>Liberado</span>
+                </span>
+              </div>
+              <div className="text-xs font-bold text-white">Página de Conversão</div>
+              <div className="text-[11px] text-brand-muted mt-1 leading-snug">
+                Checkout direto com preservação integral de UTMs e Click ID atribuído.
+              </div>
+            </div>
+
+            {/* Destination 2: Safe Page (Proteção & Compliance) */}
+            <div
+              className={`p-3.5 rounded-2xl border transition-all ${
+                activeTab === "all" || activeTab === "bot"
+                  ? "bg-[#10131c] border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.06)]"
+                  : "bg-black/40 border-white/5 opacity-40"
+              }`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/15 text-neutral-300 font-semibold">
+                  ROTA SEGURA
+                </span>
+                <span className="text-[10px] font-mono text-neutral-400 flex items-center space-x-1">
+                  <ShieldAlert className="w-3 h-3 text-neutral-400" />
+                  <span>Mitigado</span>
+                </span>
+              </div>
+              <div className="text-xs font-bold text-neutral-200">Safe Page / Verificação</div>
+              <div className="text-[11px] text-brand-muted mt-1 leading-snug">
+                Artigo neutro ou verificação institucional. Zero risco de reprovação ou bloqueio.
+              </div>
             </div>
           </div>
         </div>

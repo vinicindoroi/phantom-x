@@ -6,7 +6,17 @@ import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { auth } from "@/lib/auth";
 import { Logo } from "@/components/ui/Logo";
-import { Eye, EyeOff, Lock, Mail, ArrowRight } from "lucide-react";
+import { RotatingGlobe } from "@/components/ui/RotatingGlobe";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  ArrowRight,
+  ShieldCheck,
+  Zap,
+  Activity,
+} from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +44,6 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Simulate secure auth handshake
       await new Promise((resolve) => setTimeout(resolve, 600));
       auth.login(email, password);
       router.push("/dashboard");
@@ -46,127 +55,228 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-black flex flex-col justify-between p-6">
-      {/* Top Header */}
-      <div className="flex justify-between items-center max-w-5xl mx-auto w-full">
-        <Link href="/" className="flex items-center space-x-3">
-          <Logo size={28} />
-          <span className="font-mono text-sm font-bold text-white tracking-widest">
-            {siteConfig.name}
-          </span>
-        </Link>
-        <Link
-          href="/signup"
-          className="text-xs font-mono text-brand-secondary hover:text-white transition"
-        >
-          Não tem conta? <span className="text-white underline">Criar cadastro</span>
-        </Link>
-      </div>
+    <div className="min-h-screen w-full bg-[#030304] text-white flex flex-col lg:flex-row font-sans selection:bg-white selection:text-black">
+      {/* 
+        ========================================================================
+        LADO ESQUERDO: SHOWCASE DINÂMICO COM GLOBO 3D, AUTORIDADE E RETENÇÃO
+        ========================================================================
+      */}
+      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-[#0c0e14] via-[#06070a] to-[#010102] border-b lg:border-b-0 lg:border-r border-white/10 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-hidden">
+        {/* Subtle Ambient Glow Effect */}
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
-      {/* Login Card Form */}
-      <div className="w-full max-w-md mx-auto my-auto py-8 font-sans">
-        <div className="bg-gradient-to-b from-[#141414] via-[#0f0f0f] to-[#080808] border border-brand-border rounded-2xl p-8 shadow-glow">
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              Bom ter você de volta.
-            </h1>
-            <p className="text-xs text-brand-secondary mt-1">
-              Entre na sua conta para acompanhar sua operação.
+        {/* Top Header Logo */}
+        <div className="relative z-10 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <Logo size={36} className="filter drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" />
+            <div className="flex flex-col">
+              <span className="font-mono text-sm font-bold text-white tracking-widest leading-none">
+                {siteConfig.name}
+              </span>
+              <span className="text-[10px] text-brand-muted tracking-wider font-mono uppercase mt-0.5">
+                Traffic Intelligence & Stealth Cloaking
+              </span>
+            </div>
+          </Link>
+          <div className="hidden sm:flex items-center space-x-2 text-[11px] font-mono text-brand-muted bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span>Console Seguro</span>
+          </div>
+        </div>
+
+        {/* Center: Rotating 3D Globe & Dynamic Interactive Authority */}
+        <div className="relative z-10 my-auto py-8 flex flex-col items-center text-center">
+          <div className="relative flex items-center justify-center mb-6">
+            <RotatingGlobe size={310} />
+          </div>
+
+          <div className="max-w-md mx-auto space-y-3">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+              Acesso ao Centro de Comando Phantom-X.
+            </h2>
+            <p className="text-xs sm:text-sm text-brand-secondary font-sans leading-relaxed">
+              Monitore fluxos de tráfego em tempo real, configure regras determinísticas de borda e proteja suas ofertas com latência submilisegundo.
             </p>
           </div>
 
-          {error && (
-            <div className="mb-5 p-3 rounded-lg bg-neutral-900 border border-neutral-700 text-xs text-brand-white font-mono flex items-center justify-between">
-              <span>{error}</span>
-              <button onClick={() => setError(null)} className="text-brand-muted hover:text-white">
-                ✕
-              </button>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-mono text-brand-secondary mb-1.5">
-                E-MAIL PROFISSIONAL
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="operador@suaempresa.com"
-                  required
-                  className="w-full pl-9 pr-3 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
+          {/* Value Props */}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg text-left">
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <Zap className="w-3.5 h-3.5 text-white" />
+                <span>Roteamento Borda</span>
               </div>
+              <p className="text-[11px] text-brand-muted">
+                Execução local distribuída em mais de 14 data centers.
+              </p>
             </div>
 
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-mono text-brand-secondary">
-                  SENHA DE ACESSO
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="text-[11px] font-mono text-brand-muted hover:text-white transition"
-                >
-                  Esqueci minha senha
-                </Link>
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                <span>Filtragem Ativa</span>
               </div>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pl-9 pr-10 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-2.5 text-brand-muted hover:text-white"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+              <p className="text-[11px] text-brand-muted">
+                Heurísticas de inspeção contra bots de ad networks.
+              </p>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <Activity className="w-3.5 h-3.5 text-white" />
+                <span>Telemetria Real</span>
               </div>
+              <p className="text-[11px] text-brand-muted">
+                Métricas precisas de cliques, IPs e decisões de tráfego.
+              </p>
             </div>
+          </div>
+        </div>
 
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center space-x-2 text-xs text-brand-secondary cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="rounded border-brand-border bg-brand-black text-white focus:ring-0"
-                />
-                <span className="text-[11px]">Manter conectado neste terminal</span>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-4 py-3 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition shadow-glow-sm flex items-center justify-center space-x-2 disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="font-mono text-xs">Validando sessão...</span>
-              ) : (
-                <>
-                  <span>Entrar na plataforma</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+        {/* Bottom Slogan / Footer Indicator */}
+        <div className="relative z-10 pt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-brand-muted border-t border-white/10 gap-2">
+          <span>Sessão Criptografada • TLS 1.3</span>
+          <span>phantomx.pro</span>
         </div>
       </div>
 
-      {/* Footer info */}
-      <div className="text-center text-[11px] font-mono text-brand-muted max-w-md mx-auto">
-        Protegido por isolamento de tenant, tokens seguros e auditoria contínua.
+      {/* 
+        ========================================================================
+        LADO DIREITO: FORMULÁRIO DE LOGIN COM LOGO, ELEGANTE E MINIMALISTA
+        ========================================================================
+      */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative overflow-y-auto">
+        <div className="w-full max-w-md my-auto space-y-6">
+          {/* Box de Login */}
+          <div className="bg-gradient-to-b from-[#13161f]/95 via-[#0c0e14]/95 to-[#06070a]/95 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl ring-1 ring-white/5">
+            {/* Top Logo & System Brand */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="relative mb-3">
+                <div className="absolute inset-0 bg-white/15 rounded-2xl blur-lg animate-pulse" />
+                <div className="relative w-14 h-14 rounded-2xl bg-black border border-white/20 p-2 flex items-center justify-center shadow-lg">
+                  <Logo size={42} className="filter drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]" />
+                </div>
+              </div>
+
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <span>Entrar no</span>
+                <span className="font-mono tracking-widest">PHANTOM X</span>
+              </h1>
+              <p className="text-xs text-brand-secondary mt-1">
+                Acesse o console para gerenciar seus domínios e regras.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-5 p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-xs text-white font-mono flex items-center justify-between">
+                <span>{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-brand-muted hover:text-white ml-2 text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-mono text-brand-secondary mb-1.5 font-medium">
+                  E-MAIL DE ACESSO
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="operador@suaempresa.com"
+                    required
+                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Senha */}
+              <div>
+                <div className="flex justify-between items-center mb-1.5">
+                  <label className="text-xs font-mono text-brand-secondary font-medium">
+                    SENHA
+                  </label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-[11px] font-mono text-brand-muted hover:text-white transition"
+                  >
+                    Esqueceu?
+                  </Link>
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    required
+                    className="w-full pl-9 pr-9 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-brand-muted hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Manter Conectado */}
+              <div className="pt-1">
+                <label className="flex items-center space-x-2 text-xs text-brand-secondary cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-white/20 bg-black text-white focus:ring-0"
+                  />
+                  <span className="text-[11px]">Manter sessão ativa neste terminal</span>
+                </label>
+              </div>
+
+              {/* Botão Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-4 py-3 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition shadow-[0_0_20px_rgba(255,255,255,0.25)] flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="font-mono text-xs animate-pulse">
+                    Autenticando sessão segura...
+                  </span>
+                ) : (
+                  <>
+                    <span>Entrar no Console</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Alternar para Cadastro */}
+            <div className="mt-5 pt-4 border-t border-white/10 text-center text-xs text-brand-secondary font-mono">
+              Não possui uma conta?{" "}
+              <Link href="/signup" className="text-white font-semibold underline hover:text-neutral-300">
+                Criar conta de operador
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center text-[11px] font-mono text-brand-muted">
+            Terminal autenticado com criptografia ponta a ponta
+          </div>
+        </div>
       </div>
     </div>
   );

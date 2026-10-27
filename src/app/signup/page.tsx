@@ -6,15 +6,31 @@ import { useRouter } from "next/navigation";
 import { siteConfig } from "@/config/site";
 import { auth } from "@/lib/auth";
 import { Logo } from "@/components/ui/Logo";
-import { Lock, Mail, User, ArrowRight } from "lucide-react";
+import { RotatingGlobe } from "@/components/ui/RotatingGlobe";
+import { TIMEZONE_REGIONS, DEFAULT_TIMEZONE } from "@/lib/timezones";
+import {
+  Lock,
+  Mail,
+  User,
+  ArrowRight,
+  Globe2,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Zap,
+  Activity,
+  Layers,
+} from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [timezone, setTimezone] = useState(DEFAULT_TIMEZONE);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,7 +61,7 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      await new Promise((resolve) => setTimeout(resolve, 650));
       auth.signup(name, email);
       router.push("/dashboard");
     } catch {
@@ -56,155 +72,303 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-black flex flex-col justify-between p-6">
-      {/* Top Header */}
-      <div className="flex justify-between items-center max-w-5xl mx-auto w-full">
-        <Link href="/" className="flex items-center space-x-3">
-          <Logo size={28} />
-          <span className="font-mono text-sm font-bold text-white tracking-widest">
-            {siteConfig.name}
-          </span>
-        </Link>
-        <Link
-          href="/login"
-          className="text-xs font-mono text-brand-secondary hover:text-white transition"
-        >
-          Já possui conta? <span className="text-white underline">Fazer login</span>
-        </Link>
-      </div>
+    <div className="min-h-screen w-full bg-[#030304] text-white flex flex-col lg:flex-row font-sans selection:bg-white selection:text-black">
+      {/* 
+        ========================================================================
+        LADO ESQUERDO: SHOWCASE DINÂMICO COM GLOBO 3D, AUTORIDADE E RETENÇÃO
+        ========================================================================
+      */}
+      <div className="w-full lg:w-1/2 relative bg-gradient-to-br from-[#0c0e14] via-[#06070a] to-[#010102] border-b lg:border-b-0 lg:border-r border-white/10 p-6 sm:p-10 lg:p-12 flex flex-col justify-between overflow-hidden">
+        {/* Subtle Ambient Glow Effect */}
+        <div className="absolute top-1/4 left-1/4 w-80 h-80 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 right-10 w-60 h-60 bg-white/5 rounded-full blur-2xl pointer-events-none" />
 
-      {/* Signup Card */}
-      <div className="w-full max-w-md mx-auto my-auto py-8 font-sans">
-        <div className="bg-gradient-to-b from-[#141414] via-[#0f0f0f] to-[#080808] border border-brand-border rounded-2xl p-8 shadow-glow">
-          <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              Comece a enxergar seu tráfego de outra forma.
-            </h1>
-            <p className="text-xs text-brand-secondary mt-1">
-              Crie sua conta e configure seu ambiente em poucos passos.
+        {/* Top Header Logo */}
+        <div className="relative z-10 flex items-center justify-between">
+          <Link href="/" className="flex items-center space-x-3 group">
+            <Logo size={36} className="filter drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]" />
+            <div className="flex flex-col">
+              <span className="font-mono text-sm font-bold text-white tracking-widest leading-none">
+                {siteConfig.name}
+              </span>
+              <span className="text-[10px] text-brand-muted tracking-wider font-mono uppercase mt-0.5">
+                Traffic Intelligence & Stealth Cloaking
+              </span>
+            </div>
+          </Link>
+          <div className="hidden sm:flex items-center space-x-2 text-[11px] font-mono text-brand-muted bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+            <span>PoPs Operacionais Ativos</span>
+          </div>
+        </div>
+
+        {/* Center: Rotating 3D Globe & Dynamic Interactive Authority */}
+        <div className="relative z-10 my-auto py-8 flex flex-col items-center text-center">
+          <div className="relative flex items-center justify-center mb-6">
+            <RotatingGlobe size={310} />
+          </div>
+
+          <div className="max-w-md mx-auto space-y-3">
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white leading-tight">
+              Infraestrutura de Tráfego Invisível em Escala Global.
+            </h2>
+            <p className="text-xs sm:text-sm text-brand-secondary font-sans leading-relaxed">
+              Roteamento de precisão determinístico em borda com filtragem de bots em tempo real, proteção contra inspeção e preservação de atribuição.
             </p>
           </div>
 
-          {error && (
-            <div className="mb-5 p-3 rounded-lg bg-neutral-900 border border-neutral-700 text-xs text-white font-mono flex items-center justify-between">
-              <span>{error}</span>
-              <button onClick={() => setError(null)} className="text-brand-muted hover:text-white">
-                ✕
-              </button>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-mono text-brand-secondary mb-1.5">
-                NOME COMPLETO
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Nome do operador"
-                  required
-                  className="w-full pl-9 pr-3 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
+          {/* Value Props / Instruções Claras */}
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg text-left">
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <Zap className="w-3.5 h-3.5 text-white" />
+                <span>&lt; 18ms Latência</span>
               </div>
+              <p className="text-[11px] text-brand-muted">
+                Execução na borda sem intermediários ou redirects lentos.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-mono text-brand-secondary mb-1.5">
-                E-MAIL CORPORATIVO
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="voce@empresa.com"
-                  required
-                  className="w-full pl-9 pr-3 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <ShieldCheck className="w-3.5 h-3.5 text-white" />
+                <span>Zero Footprint</span>
               </div>
+              <p className="text-[11px] text-brand-muted">
+                Assinatura estéril indetectável por crawlers e verificadores.
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-mono text-brand-secondary mb-1.5">
-                SENHA (MÍNIMO 8 CARACTERES)
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pl-9 pr-3 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
+            <div className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 backdrop-blur-sm space-y-1">
+              <div className="flex items-center space-x-1.5 text-xs font-semibold text-white">
+                <Activity className="w-3.5 h-3.5 text-white" />
+                <span>Click ID Único</span>
               </div>
+              <p className="text-[11px] text-brand-muted">
+                Atribuição idempotente e preservação estrita de UTMs.
+              </p>
             </div>
+          </div>
+        </div>
 
-            <div>
-              <label className="block text-xs font-mono text-brand-secondary mb-1.5">
-                CONFIRMAR SENHA
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  required
-                  className="w-full pl-9 pr-3 py-2.5 bg-brand-black border border-brand-border rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
-                />
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <label className="flex items-start space-x-2 text-xs text-brand-secondary cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  className="rounded border-brand-border bg-brand-black text-white focus:ring-0 mt-0.5"
-                />
-                <span className="text-[11px] leading-tight">
-                  Concordo com os{" "}
-                  <Link href="/terms" className="text-white underline">
-                    Termos de Uso
-                  </Link>{" "}
-                  e a{" "}
-                  <Link href="/privacy" className="text-white underline">
-                    Política de Privacidade
-                  </Link>
-                  .
-                </span>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full mt-4 py-3 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition shadow-glow-sm flex items-center justify-center space-x-2 disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="font-mono text-xs">Provisionando organização...</span>
-              ) : (
-                <>
-                  <span>Criar minha conta</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </>
-              )}
-            </button>
-          </form>
+        {/* Bottom Slogan / Footer Indicator */}
+        <div className="relative z-10 pt-4 flex flex-wrap items-center justify-between text-[11px] font-mono text-brand-muted border-t border-white/10 gap-2">
+          <span>SLA 99.99% • Criptografia Ponta a Ponta</span>
+          <span>phantomx.pro</span>
         </div>
       </div>
 
-      <div className="text-center text-[11px] font-mono text-brand-muted max-w-md mx-auto">
-        Seus dados são protegidos por criptografia de ponta a ponta e anonimização de IPs.
+      {/* 
+        ========================================================================
+        LADO DIREITO: FORMULÁRIO DE CADASTRO COM LOGO, FUSO HORÁRIO E ELEGÂNCIA
+        ========================================================================
+      */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 lg:p-12 relative overflow-y-auto">
+        <div className="w-full max-w-md my-auto space-y-6">
+          {/* Box de Cadastro */}
+          <div className="bg-gradient-to-b from-[#13161f]/95 via-[#0c0e14]/95 to-[#06070a]/95 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8)] backdrop-blur-xl ring-1 ring-white/5">
+            {/* Top Logo & System Brand */}
+            <div className="flex flex-col items-center text-center mb-6">
+              <div className="relative mb-3">
+                <div className="absolute inset-0 bg-white/15 rounded-2xl blur-lg animate-pulse" />
+                <div className="relative w-14 h-14 rounded-2xl bg-black border border-white/20 p-2 flex items-center justify-center shadow-lg">
+                  <Logo size={42} className="filter drop-shadow-[0_0_10px_rgba(255,255,255,0.7)]" />
+                </div>
+              </div>
+
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-white flex items-center space-x-2">
+                <span>Criar Conta no</span>
+                <span className="font-mono tracking-widest">PHANTOM X</span>
+              </h1>
+              <p className="text-xs text-brand-secondary mt-1 max-w-xs">
+                Configure seu acesso de operador e tenha visibilidade total sobre seu tráfego.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-5 p-3 rounded-xl bg-neutral-900 border border-neutral-700 text-xs text-white font-mono flex items-center justify-between">
+                <span>{error}</span>
+                <button
+                  onClick={() => setError(null)}
+                  className="text-brand-muted hover:text-white ml-2 text-sm"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Nome */}
+              <div>
+                <label className="block text-xs font-mono text-brand-secondary mb-1.5 font-medium">
+                  NOME DO OPERADOR
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome ou apelido operacional"
+                    required
+                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-mono text-brand-secondary mb-1.5 font-medium">
+                  E-MAIL PROFISSIONAL
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="operador@suaempresa.com"
+                    required
+                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* SELEÇÃO DE FUSO HORÁRIO COM DEFAULT EM AMÉRICA/SÃO PAULO */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-mono text-brand-secondary font-medium">
+                    FUSO HORÁRIO (TIMEZONE)
+                  </label>
+                  <span className="text-[10px] font-mono text-brand-muted">
+                    Horário da operação
+                  </span>
+                </div>
+                <div className="relative">
+                  <Globe2 className="w-4 h-4 text-brand-muted absolute left-3 top-3 pointer-events-none" />
+                  <select
+                    value={timezone}
+                    onChange={(e) => setTimezone(e.target.value)}
+                    className="w-full pl-9 pr-8 py-2.5 bg-black/70 border border-white/15 rounded-xl text-xs text-white focus:outline-none focus:border-white transition font-mono appearance-none cursor-pointer"
+                  >
+                    {TIMEZONE_REGIONS.map((group) => (
+                      <optgroup
+                        key={group.region}
+                        label={`${group.flag} ${group.region}`}
+                        className="bg-[#0e1017] text-white font-mono"
+                      >
+                        {group.timezones.map((tz) => (
+                          <option key={tz.value} value={tz.value} className="bg-black text-white">
+                            {tz.flag} {tz.label} ({tz.offset})
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                  <div className="absolute right-3 top-3 pointer-events-none text-brand-muted text-[10px]">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              {/* Senha */}
+              <div>
+                <label className="block text-xs font-mono text-brand-secondary mb-1.5 font-medium">
+                  SENHA (MÍNIMO 8 CARACTERES)
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    required
+                    className="w-full pl-9 pr-9 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-brand-muted hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirmar Senha */}
+              <div>
+                <label className="block text-xs font-mono text-brand-secondary mb-1.5 font-medium">
+                  CONFIRMAR SENHA
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-brand-muted absolute left-3 top-3" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    required
+                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/10 rounded-xl text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-white transition font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Termos */}
+              <div className="pt-1">
+                <label className="flex items-start space-x-2 text-xs text-brand-secondary cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="rounded border-white/20 bg-black text-white focus:ring-0 mt-0.5"
+                  />
+                  <span className="text-[11px] leading-tight">
+                    Concordo com os{" "}
+                    <Link href="/terms" className="text-white underline hover:text-neutral-300">
+                      Termos de Serviço
+                    </Link>{" "}
+                    e com a{" "}
+                    <Link href="/privacy" className="text-white underline hover:text-neutral-300">
+                      Política de Privacidade
+                    </Link>
+                    .
+                  </span>
+                </label>
+              </div>
+
+              {/* Botão Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-4 py-3 rounded-xl bg-white text-black font-semibold text-xs hover:bg-neutral-200 transition shadow-[0_0_20px_rgba(255,255,255,0.25)] flex items-center justify-center space-x-2 disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="font-mono text-xs animate-pulse">
+                    Provisionando cluster de operador...
+                  </span>
+                ) : (
+                  <>
+                    <span>Criar Minha Conta</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Alternar para Login */}
+            <div className="mt-5 pt-4 border-t border-white/10 text-center text-xs text-brand-secondary font-mono">
+              Já possui uma conta ativa?{" "}
+              <Link href="/login" className="text-white font-semibold underline hover:text-neutral-300">
+                Acessar console
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center text-[11px] font-mono text-brand-muted">
+            Protegido por infraestrutura Phantom-X Edge • SSL 256-bit
+          </div>
+        </div>
       </div>
     </div>
   );
