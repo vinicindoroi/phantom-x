@@ -8,6 +8,7 @@ import { DigitalMatrixWorldMap } from "@/components/dashboard/DigitalMatrixWorld
 import { TrafficCharts } from "@/components/dashboard/TrafficCharts";
 import { store } from "@/lib/store";
 import { TrafficEvent, GeoAggregate, MetricOverview } from "@/types";
+import { getCountryFlag, LocationBadge } from "@/lib/geoFlags";
 import {
   Activity,
   RefreshCw,
@@ -102,6 +103,7 @@ export default function DashboardOverview() {
             <div className="flex items-center space-x-2 pointer-events-auto">
               {selectedCountry && (
                 <div className="flex items-center space-x-1.5 bg-brand-surface border border-brand-border px-2.5 py-1 rounded-lg text-xs font-mono text-white">
+                  <span className="text-sm select-none">{getCountryFlag(selectedCountry)}</span>
                   <span>Filtrando: [{selectedCountry}]</span>
                   <button
                     onClick={() => setSelectedCountry(null)}
@@ -275,7 +277,12 @@ export default function DashboardOverview() {
                         {evt.campaignName || "Acesso Direto"}
                       </td>
                       <td className="py-3 text-white">
-                        {evt.city}, {evt.countryCode}
+                        <LocationBadge
+                          countryCode={evt.countryCode}
+                          cityName={evt.city}
+                          stateCode={evt.stateCode}
+                          stateName={evt.state}
+                        />
                       </td>
                       <td className="py-3 text-brand-muted font-mono">{evt.ipMasked}</td>
                       <td className="py-3 text-brand-secondary">{evt.device}</td>
@@ -293,13 +300,27 @@ export default function DashboardOverview() {
                         </span>
                       </td>
                       <td className="py-3 text-right">
-                        <span
-                          className={`text-[11px] font-semibold ${
-                            evt.isThreat ? "text-neutral-400" : "text-white"
-                          }`}
-                        >
-                          {evt.isThreat ? "Mitigado" : "Roteado"}
-                        </span>
+                        {evt.decision === "routed_offer" ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-white/10 text-white border border-white/20">
+                            OFERTA
+                          </span>
+                        ) : evt.decision === "mitigated_safe" ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-900 text-neutral-300 border border-neutral-800">
+                            SAFE PAGE
+                          </span>
+                        ) : evt.decision === "blocked" ? (
+                          <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-neutral-950 text-neutral-500 border border-neutral-900">
+                            BLOQUEADO
+                          </span>
+                        ) : (
+                          <span
+                            className={`text-[11px] font-semibold ${
+                              evt.isThreat ? "text-neutral-400" : "text-white"
+                            }`}
+                          >
+                            {evt.isThreat ? "SAFE PAGE" : "OFERTA"}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))

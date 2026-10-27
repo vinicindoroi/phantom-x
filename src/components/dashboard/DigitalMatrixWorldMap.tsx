@@ -9,6 +9,7 @@ import {
   MATRIX_TECH_HUBS,
 } from "./worldDotData";
 import { ZoomIn, ZoomOut, RotateCcw, Activity } from "lucide-react";
+import { getCountryFlag } from "@/lib/geoFlags";
 
 interface DigitalMatrixWorldMapProps {
   events?: TrafficEvent[];
@@ -45,6 +46,8 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
     percentage: number;
     lat: number;
     lon: number;
+    state?: string;
+    stateCode?: string;
   } | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
@@ -108,8 +111,13 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // 100% PURE SOLID BLACK BACKGROUND
-      ctx.fillStyle = "#000000";
+      // Sophisticated Obsidian/Graphite Gradient Background for Deep Command Center Depth
+      const bgGrad = ctx.createRadialGradient(w / 2, h / 2, 25, w / 2, h / 2, Math.max(w, h) * 0.75);
+      bgGrad.addColorStop(0, "#141722");
+      bgGrad.addColorStop(0.35, "#0b0d13");
+      bgGrad.addColorStop(0.72, "#040507");
+      bgGrad.addColorStop(1, "#010102");
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, w, h);
 
       // Apply Zoom & Pan
@@ -127,8 +135,10 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
       const cellH = usableH / MATRIX_ROWS;
       const baseDotSize = Math.max(2.4, Math.min(cellW * 0.8, cellH * 0.8));
 
-      // 1. Draw Continental Matrix Dots (Calm, clean, NO hover bubble/illumination halo)
-      ctx.fillStyle = "rgba(161, 161, 170, 0.45)";
+      // 1. Draw Continental Matrix Dots (Luminous white with delicate subtle glow)
+      ctx.fillStyle = "rgba(240, 245, 255, 0.74)";
+      ctx.shadowColor = "rgba(255, 255, 255, 0.38)";
+      ctx.shadowBlur = 3;
       const dotRadius = Math.max(0.6, baseDotSize * 0.22);
 
       WORLD_MATRIX_DOTS.forEach(([col, row]) => {
@@ -143,6 +153,8 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
         }
         ctx.fill();
       });
+      // Reset glow shadow so it doesn't affect other operations
+      ctx.shadowBlur = 0;
 
       // 2. Active Tech Hub Nodes with Clean Radar Rings
       activeHubNodes.forEach((hub) => {
@@ -152,7 +164,9 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
 
         // If hub has real traffic or is selected
         if (hub.hasActivity || isSelected) {
-          // Sharp white center dot (no blur halo)
+          // Sharp luminous white center dot with soft halo
+          ctx.shadowColor = "rgba(255, 255, 255, 0.75)";
+          ctx.shadowBlur = 5;
           ctx.fillStyle = "#ffffff";
 
           ctx.beginPath();
@@ -162,6 +176,7 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
             ctx.rect(px - 1, py - 1, baseDotSize + 2, baseDotSize + 2);
           }
           ctx.fill();
+          ctx.shadowBlur = 0;
 
           // Expanding radar ring pulse
           const wave = (Math.sin(pulseCycle + hub.row * 0.5) + 1) / 2;
@@ -374,6 +389,7 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
       {/* Selected Country Filter Badge */}
       {selectedCountry && (
         <div className="absolute top-4 left-4 flex items-center space-x-2 bg-brand-surface/90 backdrop-blur border border-brand-border px-3 py-1.5 rounded-lg text-xs font-mono z-20">
+          <span className="text-sm select-none">{getCountryFlag(selectedCountry)}</span>
           <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
           <span className="text-white">Filtrando por: {selectedCountry}</span>
           {onSelectCountry && (
@@ -402,13 +418,26 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
       {hoveredNode && (
         <div
           style={{ left: tooltipPos.x + 14, top: tooltipPos.y - 12 }}
-          className="pointer-events-none absolute z-30 bg-brand-surface border border-brand-border px-3 py-2 rounded-xl shadow-glow text-xs font-sans"
+          className="pointer-events-none absolute z-30 bg-[#0d0e14]/95 backdrop-blur-md border border-white/10 px-3.5 py-2.5 rounded-xl shadow-[0_10px_35px_rgba(0,0,0,0.85)] text-xs font-sans ring-1 ring-white/5"
         >
-          <div className="font-semibold text-white flex items-center justify-between space-x-4">
-            <span>{hoveredNode.name}</span>
-            <span className="text-brand-secondary font-mono">[{hoveredNode.code}]</span>
+          <div className="font-semibold text-white flex items-center justify-between space-x-3">
+            <div className="flex items-center space-x-1.5">
+              <span className="text-base leading-none select-none">{getCountryFlag(hoveredNode.code)}</span>
+              <span className="text-white font-medium">{hoveredNode.name}</span>
+              {hoveredNode.stateCode && (
+                <span className="text-[10px] bg-white/10 text-white font-mono px-1.5 py-0.5 rounded border border-white/10 font-bold">
+                  {hoveredNode.stateCode}
+                </span>
+              )}
+            </div>
+            <span className="text-brand-secondary font-mono text-[11px]">[{hoveredNode.code}]</span>
           </div>
-          <div className="text-brand-secondary mt-1 flex justify-between space-x-4 text-[11px]">
+          {hoveredNode.state && (
+            <div className="text-[11px] text-brand-muted mt-0.5 pl-6">
+              {hoveredNode.state}
+            </div>
+          )}
+          <div className="text-brand-secondary mt-2 flex justify-between space-x-4 text-[11px]">
             <span>Volume registrado:</span>
             <span className="text-white font-bold font-mono">{hoveredNode.eventsCount} reqs</span>
           </div>
@@ -418,7 +447,7 @@ export const DigitalMatrixWorldMap: React.FC<DigitalMatrixWorldMapProps> = ({
               <span className="text-white font-mono">{hoveredNode.percentage}%</span>
             </div>
           )}
-          <div className="text-[10px] text-brand-muted mt-1 italic">
+          <div className="text-[10px] text-brand-muted mt-1.5 border-t border-white/5 pt-1 italic">
             Clique para filtrar por este território
           </div>
         </div>

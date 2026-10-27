@@ -7,35 +7,42 @@ import {
   RoutingRule,
   TrafficEvent,
 } from "@/types";
+import { CloakerEngine } from "./cloakerEngine";
+import { resolveLocationMetadata } from "./geoFlags";
 
-// Global traffic hub definitions
+// Global traffic hub definitions with precise states/provinces
 export const GLOBAL_LOCATIONS = [
-  { city: "São Paulo", country: "Brasil", code: "BR", lat: -23.5505, lon: -46.6333 },
-  { city: "Rio de Janeiro", country: "Brasil", code: "BR", lat: -22.9068, lon: -43.1729 },
-  { city: "Nova York", country: "Estados Unidos", code: "US", lat: 40.7128, lon: -74.006 },
-  { city: "San Francisco", country: "Estados Unidos", code: "US", lat: 37.7749, lon: -122.4194 },
-  { city: "Londres", country: "Reino Unido", code: "GB", lat: 51.5074, lon: -0.1278 },
-  { city: "Frankfurt", country: "Alemanha", code: "DE", lat: 50.1109, lon: 8.6821 },
-  { city: "Tóquio", country: "Japão", code: "JP", lat: 35.6762, lon: 139.6503 },
-  { city: "Paris", country: "França", code: "FR", lat: 48.8566, lon: 2.3522 },
-  { city: "Toronto", country: "Canadá", code: "CA", lat: 43.6532, lon: -79.3832 },
-  { city: "Sydney", country: "Austrália", code: "AU", lat: -33.8688, lon: 151.2093 },
-  { city: "Amsterdã", country: "Holanda", code: "NL", lat: 52.3676, lon: 4.9041 },
-  { city: "Singapura", country: "Singapura", code: "SG", lat: 1.3521, lon: 103.8198 },
-  { city: "Lisboa", country: "Portugal", code: "PT", lat: 38.7223, lon: -9.1393 },
-  { city: "Madrid", country: "Espanha", code: "ES", lat: 40.4168, lon: -3.7038 },
+  { city: "São Paulo", state: "São Paulo", stateCode: "SP", country: "Brasil", code: "BR", lat: -23.5505, lon: -46.6333 },
+  { city: "Rio de Janeiro", state: "Rio de Janeiro", stateCode: "RJ", country: "Brasil", code: "BR", lat: -22.9068, lon: -43.1729 },
+  { city: "Belo Horizonte", state: "Minas Gerais", stateCode: "MG", country: "Brasil", code: "BR", lat: -19.9167, lon: -43.9345 },
+  { city: "Curitiba", state: "Paraná", stateCode: "PR", country: "Brasil", code: "BR", lat: -25.4284, lon: -49.2733 },
+  { city: "Porto Alegre", state: "Rio Grande do Sul", stateCode: "RS", country: "Brasil", code: "BR", lat: -30.0346, lon: -51.2177 },
+  { city: "Brasília", state: "Distrito Federal", stateCode: "DF", country: "Brasil", code: "BR", lat: -15.7975, lon: -47.8919 },
+  { city: "Salvador", state: "Bahia", stateCode: "BA", country: "Brasil", code: "BR", lat: -12.9777, lon: -38.5016 },
+  { city: "Nova York", state: "New York", stateCode: "NY", country: "Estados Unidos", code: "US", lat: 40.7128, lon: -74.006 },
+  { city: "San Francisco", state: "California", stateCode: "CA", country: "Estados Unidos", code: "US", lat: 37.7749, lon: -122.4194 },
+  { city: "Miami", state: "Florida", stateCode: "FL", country: "Estados Unidos", code: "US", lat: 25.7617, lon: -80.1918 },
+  { city: "Londres", state: "Inglaterra", stateCode: "ENG", country: "Reino Unido", code: "GB", lat: 51.5074, lon: -0.1278 },
+  { city: "Frankfurt", state: "Hessen", stateCode: "HE", country: "Alemanha", code: "DE", lat: 50.1109, lon: 8.6821 },
+  { city: "Tóquio", state: "Tóquio", stateCode: "TK", country: "Japão", code: "JP", lat: 35.6762, lon: 139.6503 },
+  { city: "Paris", state: "Île-de-France", stateCode: "IDF", country: "França", code: "FR", lat: 48.8566, lon: 2.3522 },
+  { city: "Toronto", state: "Ontário", stateCode: "ON", country: "Canadá", code: "CA", lat: 43.6532, lon: -79.3832 },
+  { city: "Sydney", state: "Nova Gales do Sul", stateCode: "NSW", country: "Austrália", code: "AU", lat: -33.8688, lon: 151.2093 },
+  { city: "Amsterdã", state: "Holanda do Norte", stateCode: "NH", country: "Holanda", code: "NL", lat: 52.3676, lon: 4.9041 },
+  { city: "Singapura", state: "Singapura", stateCode: "SG", country: "Singapura", code: "SG", lat: 1.3521, lon: 103.8198 },
+  { city: "Lisboa", state: "Lisboa", stateCode: "LX", country: "Portugal", code: "PT", lat: 38.7223, lon: -9.1393 },
+  { city: "Madrid", state: "Madrid", stateCode: "MD", country: "Espanha", code: "ES", lat: 40.4168, lon: -3.7038 },
 ];
 
-const BROWSERS = ["Chrome 124", "Safari 17.4", "Firefox 125", "Edge 124", "HeadlessChrome"];
-const OS_LIST = ["Windows 11", "macOS Sonoma", "iOS 17.4", "Android 14", "Linux x86_64"];
+const BROWSERS = ["Chrome 124", "Safari 17.4", "Firefox 125", "Edge 124", "Mobile Safari"];
+const OS_LIST = ["iOS 17.4", "Android 14", "Windows 11", "macOS Sonoma", "Linux x86_64"];
 const REFERRERS = [
-  "https://google.com/search",
   "https://instagram.com",
   "https://facebook.com",
+  "https://google.com/search",
+  "https://tiktok.com",
   "https://linkedin.com",
-  "https://twitter.com",
   "Direto / Marcador",
-  "https://youtube.com",
 ];
 
 // USER ACCOUNT STORES START AT 100% ZERO FOR NEW ACCOUNTS
@@ -58,42 +65,58 @@ function generateDemoEventsPool(count: number = 60): TrafficEvent[] {
     const isSuspicious = !isBot && Math.random() < 0.15;
 
     const riskScore = isBot
-      ? Math.floor(75 + Math.random() * 25)
+      ? Math.floor(78 + Math.random() * 22)
       : isSuspicious
-      ? Math.floor(40 + Math.random() * 30)
-      : Math.floor(1 + Math.random() * 25);
+      ? Math.floor(40 + Math.random() * 25)
+      : Math.floor(2 + Math.random() * 24);
 
     const riskCategory: RiskCategory = isBot ? "bot" : isSuspicious ? "suspicious" : "clean";
-    const device = isBot ? "bot" : Math.random() < 0.65 ? "mobile" : "desktop";
+    const classification = isBot ? "known-crawler" : isSuspicious ? "suspicious" : "human-like";
+    const decision = isBot ? "mitigated_safe" : "routed_offer";
+    const device = isBot ? "bot" : Math.random() < 0.72 ? "mobile" : "desktop";
     const ipLast = Math.floor(Math.random() * 254) + 1;
     const ipFirst = Math.floor(Math.random() * 190) + 10;
     const rawIp = `${ipFirst}.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}.${ipLast}`;
     const ipMasked = `${ipFirst}.${Math.floor(Math.random() * 250)}.***.***`;
 
+    const threatReasons = isBot
+      ? ["Crawler de inspeção de anúncios / Datacenter ASN (AWS/Meta)"]
+      : isSuspicious
+      ? ["Inconsistência de cabeçalho / Proxy residencial detectado"]
+      : [];
+
+    const clickId = CloakerEngine.generateClickId();
+
     events.push({
-      id: `evt_demo_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}_${i}`,
+      id: `evt_demo_${Date.now().toString(36)}_${i}`,
+      clickId,
       timestamp: new Date(now - timeOffset).toISOString(),
-      domain: "checkout.phantom-x.io",
+      domain: "checkout.phantomx.pro",
       campaignId: "camp_demo",
-      campaignName: "Lançamento Q4 — Tráfego Pago",
+      campaignName: "Lançamento Q4 — Tráfego Pago Meta",
       ip: rawIp,
       ipMasked,
       country: loc.country,
       countryCode: loc.code,
+      state: loc.state,
+      stateCode: loc.stateCode,
       city: loc.city,
-      latitude: loc.lat + (Math.random() - 0.5) * 0.1,
-      longitude: loc.lon + (Math.random() - 0.5) * 0.1,
+      latitude: loc.lat + (Math.random() - 0.5) * 0.05,
+      longitude: loc.lon + (Math.random() - 0.5) * 0.05,
       device,
-      browser: isBot ? "HeadlessChrome / Crawler" : BROWSERS[Math.floor(Math.random() * (BROWSERS.length - 1))],
+      browser: isBot ? "Headless / AdReviewBot" : BROWSERS[Math.floor(Math.random() * (BROWSERS.length - 1))],
       os: OS_LIST[Math.floor(Math.random() * OS_LIST.length)],
       referrer: REFERRERS[Math.floor(Math.random() * REFERRERS.length)],
       targetUrl: "https://minhaloja.com/checkout",
-      routedTo: isBot ? "https://minhaloja.com/verificacao-seguranca" : "https://minhaloja.com/checkout",
+      routedTo: isBot ? "https://phantomx.pro/verificacao-seguranca" : `https://minhaloja.com/checkout?clk_id=${clickId}`,
       riskScore,
       riskCategory,
-      latencyMs: Math.floor(12 + Math.random() * 38),
+      classification,
+      decision,
+      ispOrg: isBot ? "Amazon Technologies (Datacenter)" : "Claro Brasil Móvel",
+      latencyMs: Math.floor(10 + Math.random() * 28),
       isThreat: isBot || riskScore > 70,
-      threatReasons: isBot ? ["Assinatura automatizada Headless"] : [],
+      threatReasons,
     });
   }
 
@@ -103,7 +126,6 @@ function generateDemoEventsPool(count: number = 60): TrafficEvent[] {
 demoEventsCache = generateDemoEventsPool(80);
 
 export const store = {
-  // Reset account completely back to zero
   resetAccountToZero() {
     domainsStore = [];
     campaignsStore = [];
@@ -111,15 +133,14 @@ export const store = {
     eventsStore = [];
   },
 
-  // Seed sample data if user explicitly wants to populate test data
   seedAccountDemo() {
     const defaultDom: Domain = {
       id: `dom_${Date.now().toString(36)}`,
-      name: "checkout.phantom-x.io",
+      name: "checkout.phantomx.pro",
       status: "active",
       sslStatus: "valid",
       dnsRecords: [
-        { type: "CNAME", host: "checkout", expected: "cname.phantom-edge.io", verified: true },
+        { type: "CNAME", host: "checkout", expected: "cname.phantomx.pro", verified: true },
         { type: "TXT", host: "_phantom-challenge", expected: "phantom-verify=894318712", verified: true },
       ],
       eventsCount: 15,
@@ -137,7 +158,7 @@ export const store = {
         domainName: defaultDom.name,
         status: "active",
         targetUrl: "https://meusite.com/oferta",
-        fallbackUrl: "https://meusite.com/seguranca",
+        fallbackUrl: "https://phantomx.pro/verificacao-seguranca",
         utmSource: "meta",
         utmMedium: "cpc",
         utmCampaign: "teste_borda",
@@ -153,7 +174,6 @@ export const store = {
     eventsStore = generateDemoEventsPool(15);
   },
 
-  // Overview metrics: 100% zero when account is new
   getOverviewMetrics(): MetricOverview {
     if (eventsStore.length === 0) {
       return {
@@ -176,7 +196,6 @@ export const store = {
     const uniqueCountries = new Set(eventsStore.map((e) => e.countryCode)).size;
     const uniqueSessions = new Set(eventsStore.map((e) => e.ipMasked)).size;
 
-    // Active visitors: non-threat events in the last 15 minutes
     const fifteenMinAgo = Date.now() - 15 * 60 * 1000;
     const recentClean = eventsStore.filter(
       (e) => new Date(e.timestamp).getTime() > fifteenMinAgo && !e.isThreat
@@ -229,9 +248,12 @@ export const store = {
         (e) =>
           e.city.toLowerCase().includes(q) ||
           e.country.toLowerCase().includes(q) ||
+          (e.state && e.state.toLowerCase().includes(q)) ||
+          (e.stateCode && e.stateCode.toLowerCase().includes(q)) ||
           e.domain.toLowerCase().includes(q) ||
           e.ipMasked.includes(q) ||
-          e.browser.toLowerCase().includes(q)
+          e.browser.toLowerCase().includes(q) ||
+          (e.clickId && e.clickId.toLowerCase().includes(q))
       );
     }
 
@@ -246,46 +268,63 @@ export const store = {
     ip?: string;
     campaignId?: string;
     referrer?: string;
+    utmParams?: Record<string, string>;
   }): TrafficEvent {
     const loc = GLOBAL_LOCATIONS[Math.floor(Math.random() * GLOBAL_LOCATIONS.length)];
-    const ua = payload.userAgent || "Mozilla/5.0";
-
-    const isKnownBot = /bot|crawl|spider|slurp|headless|wget|curl|python-requests|aiohttp|httpx|postman|scrapy|urllib/i.test(ua);
-    const riskScore = isKnownBot
-      ? Math.floor(80 + Math.random() * 20)
-      : Math.floor(5 + Math.random() * 25);
-    const riskCategory: RiskCategory = isKnownBot ? "bot" : riskScore > 65 ? "suspicious" : "clean";
-
-    const matchedDomain = payload.domain || domainsStore[0]?.name || "app.phantom-x.io";
+    const matchedDomain = payload.domain || domainsStore[0]?.name || "app.phantomx.pro";
     const matchedCampaign = campaignsStore.find((c) => c.id === payload.campaignId) || campaignsStore[0];
+    const targetUrl = payload.targetUrl || matchedCampaign?.targetUrl || "https://meusite.com/oferta";
+    const fallbackUrl = matchedCampaign?.fallbackUrl || "https://phantomx.pro/verificacao-seguranca";
+
+    const assessment = CloakerEngine.evaluateRequest({
+      userAgent: payload.userAgent,
+      referrer: payload.referrer,
+      countryCode: loc.code,
+      targetUrl,
+      fallbackUrl,
+      utmParams: payload.utmParams,
+    });
+
     const rawIp = payload.ip || `177.${Math.floor(Math.random() * 200)}.${Math.floor(Math.random() * 200)}.45`;
     const ipMasked = rawIp.replace(/\.\d+\.\d+$/, ".***.***");
-    const targetUrl = payload.targetUrl || matchedCampaign?.targetUrl || "https://meusite.com";
+    const riskCategory: RiskCategory = assessment.isThreat
+      ? "bot"
+      : assessment.riskScore > 40
+      ? "suspicious"
+      : "clean";
+
+    const meta = resolveLocationMetadata(loc.city, loc.code, loc.stateCode);
 
     const newEvent: TrafficEvent = {
       id: `evt_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 7)}`,
-      timestamp: new Date().toISOString(),
+      clickId: assessment.clickId,
+      timestamp: assessment.timestamp,
       domain: matchedDomain,
       campaignId: matchedCampaign?.id || "camp_default",
-      campaignName: matchedCampaign?.name || "Roteamento Geral",
+      campaignName: matchedCampaign?.name || "Roteamento Cloaker Geral",
       ip: rawIp,
       ipMasked,
-      country: loc.country,
+      country: meta.country,
       countryCode: loc.code,
+      state: meta.state,
+      stateCode: meta.stateCode,
       city: loc.city,
       latitude: loc.lat,
       longitude: loc.lon,
-      device: isKnownBot ? "bot" : "mobile",
-      browser: isKnownBot ? "Bot / Crawler" : "Chrome 124",
-      os: "Android 14",
-      referrer: payload.referrer || "https://google.com",
+      device: assessment.device,
+      browser: assessment.browser,
+      os: assessment.os,
+      referrer: payload.referrer || "https://google.com/search",
       targetUrl,
-      routedTo: isKnownBot ? "https://minhaloja.com/verificacao-seguranca" : targetUrl,
-      riskScore,
+      routedTo: assessment.routedUrl,
+      riskScore: assessment.riskScore,
       riskCategory,
-      latencyMs: Math.floor(14 + Math.random() * 25),
-      isThreat: isKnownBot,
-      threatReasons: isKnownBot ? ["User-Agent com assinatura automatizada"] : [],
+      classification: assessment.classification,
+      decision: assessment.decision,
+      ispOrg: assessment.ispOrg,
+      latencyMs: Math.floor(10 + Math.random() * 22),
+      isThreat: assessment.isThreat,
+      threatReasons: assessment.threatReasons,
     };
 
     eventsStore.unshift(newEvent);
@@ -293,7 +332,6 @@ export const store = {
       eventsStore.pop();
     }
 
-    // Update domain and campaign counters
     const dom = domainsStore.find((d) => d.name === matchedDomain);
     if (dom) {
       dom.eventsCount = (dom.eventsCount || 0) + 1;
@@ -313,42 +351,71 @@ export const store = {
   generateRandomSimulatedEvent(): TrafficEvent {
     const loc = GLOBAL_LOCATIONS[Math.floor(Math.random() * GLOBAL_LOCATIONS.length)];
     const camp = campaignsStore[Math.floor(Math.random() * campaignsStore.length)];
-    const isThreat = Math.random() < 0.15;
-    const isSusp = !isThreat && Math.random() < 0.15;
-    const riskScore = isThreat
-      ? Math.floor(82 + Math.random() * 18)
-      : isSusp
-      ? Math.floor(45 + Math.random() * 25)
-      : Math.floor(2 + Math.random() * 28);
-    const riskCategory: RiskCategory = isThreat ? "bot" : isSusp ? "suspicious" : "clean";
+    const domainName = camp?.domainName || domainsStore[0]?.name || "gateway.phantomx.pro";
+    const targetUrl = camp?.targetUrl || "https://meusite.com/destino";
+    const fallbackUrl = camp?.fallbackUrl || "https://phantomx.pro/verificacao-seguranca";
 
-    const domainName = camp?.domainName || domainsStore[0]?.name || "gateway.phantom-x.io";
-    const targetUrl = camp?.targetUrl || "https://seusite.com/destino";
+    const isSimulatedThreat = Math.random() < 0.16;
+    const isMobileSim = Math.random() < 0.75;
+    const simulatedUa = isSimulatedThreat
+      ? "Mozilla/5.0 (compatible; Google-InspectionTool/1.0;) AppleWebKit/537.36"
+      : isMobileSim
+      ? "Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148"
+      : "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124.0.0.0 Safari/537.36";
+
+    const assessment = CloakerEngine.evaluateRequest({
+      userAgent: simulatedUa,
+      referrer: REFERRERS[Math.floor(Math.random() * REFERRERS.length)],
+      countryCode: loc.code,
+      targetUrl,
+      fallbackUrl,
+      utmParams: {
+        utm_source: "meta",
+        utm_medium: "cpc",
+        utm_campaign: "black_q4",
+      },
+    });
+
+    const meta = resolveLocationMetadata(loc.city, loc.code, loc.stateCode);
+    const ipPrefix = loc.code === "BR" ? "177" : "189";
+    const rawIp = `${ipPrefix}.${Math.floor(Math.random() * 200)}.${Math.floor(Math.random() * 200)}.12`;
+    const ipMasked = `${ipPrefix}.${Math.floor(Math.random() * 200)}.***.***`;
+    const riskCategory: RiskCategory = assessment.isThreat
+      ? "bot"
+      : assessment.riskScore > 40
+      ? "suspicious"
+      : "clean";
 
     const event: TrafficEvent = {
       id: `evt_sim_${Date.now().toString(36)}_${Math.random().toString(36).substring(2, 6)}`,
-      timestamp: new Date().toISOString(),
+      clickId: assessment.clickId,
+      timestamp: assessment.timestamp,
       domain: domainName,
       campaignId: camp?.id || "camp_sim",
-      campaignName: camp?.name || "Tráfego Simulado",
-      ip: `189.${Math.floor(Math.random() * 200)}.${Math.floor(Math.random() * 200)}.12`,
-      ipMasked: `189.${Math.floor(Math.random() * 200)}.***.***`,
-      country: loc.country,
+      campaignName: camp?.name || "Tráfego Cloaker Simulado",
+      ip: rawIp,
+      ipMasked,
+      country: meta.country,
       countryCode: loc.code,
+      state: meta.state,
+      stateCode: meta.stateCode,
       city: loc.city,
       latitude: loc.lat + (Math.random() - 0.5) * 0.05,
       longitude: loc.lon + (Math.random() - 0.5) * 0.05,
-      device: isThreat ? "bot" : Math.random() < 0.7 ? "mobile" : "desktop",
-      browser: isThreat ? "Automated Headless" : BROWSERS[Math.floor(Math.random() * (BROWSERS.length - 1))],
-      os: OS_LIST[Math.floor(Math.random() * OS_LIST.length)],
+      device: assessment.device,
+      browser: assessment.browser,
+      os: assessment.os,
       referrer: REFERRERS[Math.floor(Math.random() * REFERRERS.length)],
       targetUrl,
-      routedTo: isThreat ? "https://seusite.com/seguranca" : targetUrl,
-      riskScore,
+      routedTo: assessment.routedUrl,
+      riskScore: assessment.riskScore,
       riskCategory,
-      latencyMs: Math.floor(10 + Math.random() * 30),
-      isThreat,
-      threatReasons: isThreat ? ["Padrão de requisição anômalo"] : [],
+      classification: assessment.classification,
+      decision: assessment.decision,
+      ispOrg: assessment.ispOrg,
+      latencyMs: Math.floor(10 + Math.random() * 20),
+      isThreat: assessment.isThreat,
+      threatReasons: assessment.threatReasons,
     };
 
     eventsStore.unshift(event);
@@ -362,7 +429,7 @@ export const store = {
     }
     if (camp) {
       camp.totalEvents += 1;
-      if (isThreat) camp.botEvents += 1;
+      if (assessment.isThreat) camp.botEvents += 1;
       else camp.cleanEvents += 1;
     }
 
@@ -384,7 +451,7 @@ export const store = {
         {
           type: "CNAME",
           host: cleanName.split(".")[0],
-          expected: "cname.phantom-edge.io",
+          expected: "cname.phantomx.pro",
           verified: false,
         },
         {
@@ -430,10 +497,10 @@ export const store = {
       id: `camp_${Date.now().toString(36)}`,
       name: data.name || "Nova Campanha",
       domainId: domain ? domain.id : "default",
-      domainName: domain ? domain.name : "phantom-x.io",
+      domainName: domain ? domain.name : "phantomx.pro",
       status: "active",
       targetUrl: data.targetUrl || "https://seusite.com",
-      fallbackUrl: data.fallbackUrl,
+      fallbackUrl: data.fallbackUrl || "https://phantomx.pro/verificacao-seguranca",
       utmSource: data.utmSource,
       utmMedium: data.utmMedium,
       utmCampaign: data.utmCampaign,
@@ -480,12 +547,12 @@ export const store = {
       id: `rule_${Date.now().toString(36)}`,
       name: data.name || "Nova Regra de Roteamento",
       domainId: domain ? domain.id : "default",
-      domainName: domain ? domain.name : "phantom-x.io",
+      domainName: domain ? domain.name : "phantomx.pro",
       priority: data.priority || routingRulesStore.length + 1,
       status: "active",
-      conditions: data.conditions || { maxRiskScore: 50 },
-      destinationUrl: data.destinationUrl || "https://destino.com",
-      fallbackUrl: data.fallbackUrl || "https://fallback.com",
+      conditions: data.conditions || { maxRiskScore: 45 },
+      destinationUrl: data.destinationUrl || "https://meusite.com/oferta",
+      fallbackUrl: data.fallbackUrl || "https://phantomx.pro/verificacao-seguranca",
       hitsCount: 0,
       createdAt: new Date().toISOString(),
     };

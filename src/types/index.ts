@@ -72,6 +72,7 @@ export interface Campaign {
 
 export interface TrafficEvent {
   id: string;
+  clickId?: string;
   timestamp: string;
   domain: string;
   campaignId?: string;
@@ -80,6 +81,8 @@ export interface TrafficEvent {
   ipMasked: string;
   country: string;
   countryCode: string;
+  state?: string;
+  stateCode?: string;
   city: string;
   latitude: number;
   longitude: number;
@@ -91,6 +94,9 @@ export interface TrafficEvent {
   routedTo: string;
   riskScore: number; // 0 to 100
   riskCategory: RiskCategory;
+  classification?: "human-like" | "known-crawler" | "preview-bot" | "automation" | "suspicious" | "unknown";
+  decision?: "routed_offer" | "mitigated_safe" | "blocked";
+  ispOrg?: string;
   latencyMs: number;
   isThreat: boolean;
   threatReasons?: string[];

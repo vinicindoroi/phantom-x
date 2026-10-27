@@ -98,7 +98,7 @@ export const SystemPreview: React.FC = () => {
             {/* Address Bar */}
             <div className="text-[11px] font-mono text-brand-secondary flex items-center space-x-1.5 bg-brand-surface/80 px-3.5 py-1 rounded-full border border-brand-border">
               <span className="text-brand-muted">https://</span>
-              <span className="text-white font-medium">console.phantom-x.io/dashboard</span>
+              <span className="text-white font-medium">console.phantomx.pro/dashboard</span>
             </div>
 
             {/* Direct Link to Live Dashboard */}

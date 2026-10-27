@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { store } from "@/lib/store";
 import { TrafficEvent, RiskCategory } from "@/types";
+import { LocationBadge } from "@/lib/geoFlags";
 import { Download, Search, Filter, ShieldCheck, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function EventsExplorerPage() {
@@ -135,8 +136,13 @@ export default function EventsExplorerPage() {
                         {new Date(evt.timestamp).toLocaleString("pt-BR")}
                       </td>
                       <td className="py-3 text-white">{evt.domain}</td>
-                      <td className="py-3 text-brand-secondary">
-                        {evt.city}, {evt.countryCode}
+                      <td className="py-3 text-white">
+                        <LocationBadge
+                          countryCode={evt.countryCode}
+                          cityName={evt.city}
+                          stateCode={evt.stateCode}
+                          stateName={evt.state}
+                        />
                       </td>
                       <td className="py-3 text-brand-muted">{evt.ipMasked}</td>
                       <td className="py-3 text-brand-secondary truncate max-w-[180px]">

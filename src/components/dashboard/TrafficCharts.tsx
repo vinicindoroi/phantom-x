@@ -2,6 +2,7 @@
 
 import React from "react";
 import { GeoAggregate } from "@/types";
+import { getCountryFlag } from "@/lib/geoFlags";
 
 interface TrafficChartsProps {
   timeSeries: { hour: string; events: number; threats: number }[];
@@ -151,7 +152,10 @@ export const TrafficCharts: React.FC<TrafficChartsProps> = ({
           <div className="space-y-1.5 text-xs font-mono">
             {geoData.slice(0, 3).map((g, i) => (
               <div key={i} className="flex justify-between items-center text-brand-secondary">
-                <span>{g.country}</span>
+                <span className="flex items-center space-x-1.5">
+                  <span className="text-sm select-none">{getCountryFlag(g.countryCode)}</span>
+                  <span>{g.country}</span>
+                </span>
                 <span className="text-white font-semibold">{g.eventsCount} ({g.percentage}%)</span>
               </div>
             ))}

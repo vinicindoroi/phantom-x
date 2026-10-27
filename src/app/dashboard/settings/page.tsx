@@ -16,7 +16,7 @@ export default function SettingsPage() {
 
   const trackingSnippet = `<!-- Script de Telemetria ${siteConfig.name} -->
 <script
-  src="https://edge.phantom-x.io/v1/telemetry.js"
+  src="https://edge.phantomx.pro/v1/telemetry.js"
   data-phantom-key="${apiKey}"
   async
 ></script>`;
@@ -72,7 +72,7 @@ export default function SettingsPage() {
               <input
                 type="text"
                 readOnly
-                value={session?.user.email || "admin@phantom-x.io"}
+                value={session?.user.email || "admin@phantomx.pro"}
                 className="w-full px-3 py-2 bg-brand-black border border-brand-border rounded-lg text-white"
               />
             </div>

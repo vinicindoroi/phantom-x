@@ -92,7 +92,7 @@ export const Pricing: React.FC = () => {
         {/* Note */}
         <div className="mt-12 text-center text-xs text-brand-muted font-mono">
           Precisa de limites customizados ou ambiente isolado (Single-Tenant)?{" "}
-          <a href="mailto:contato@phantom-x.io" className="text-white hover:underline">
+          <a href="mailto:contato@phantomx.pro" className="text-white hover:underline">
             Fale com nossa equipe técnica
           </a>
           .

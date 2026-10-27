@@ -74,7 +74,7 @@ export const Footer: React.FC = () => {
               </Link>
             </li>
             <li>
-              <a href="mailto:suporte@phantom-x.io" className="hover:text-white transition">
+              <a href="mailto:suporte@phantomx.pro" className="hover:text-white transition">
                 Suporte Técnico
               </a>
             </li>

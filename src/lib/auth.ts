@@ -10,7 +10,7 @@ export interface AuthSession {
 const DEFAULT_USER: User = {
   id: "usr_admin_01",
   name: "Engenheiro Operações",
-  email: "admin@phantom-x.io",
+  email: "admin@phantomx.pro",
   role: "admin",
   organizationId: "org_phantom_main",
   organizationName: "Phantom-X Intelligence Lab",

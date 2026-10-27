@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { store } from "@/lib/store";
 import { TrafficEvent, RiskCategory } from "@/types";
+import { getCountryFlag, LocationBadge } from "@/lib/geoFlags";
 import {
   Play,
   Pause,
@@ -168,7 +169,12 @@ export default function LiveMonitoringPage() {
                     <td className="py-3 text-white font-medium whitespace-nowrap">{evt.domain}</td>
                     <td className="py-3 text-brand-muted whitespace-nowrap">{evt.ipMasked}</td>
                     <td className="py-3 text-white whitespace-nowrap">
-                      {evt.city}, {evt.countryCode}
+                      <LocationBadge
+                        countryCode={evt.countryCode}
+                        cityName={evt.city}
+                        stateCode={evt.stateCode}
+                        stateName={evt.state}
+                      />
                     </td>
                     <td className="py-3 text-brand-secondary whitespace-nowrap">
                       {evt.latencyMs}ms
@@ -263,12 +269,43 @@ export default function LiveMonitoringPage() {
                 <span className="text-brand-muted">IP Anonimizado:</span>
                 <span className="text-white">{selectedEvent.ipMasked}</span>
               </div>
+              {selectedEvent.clickId && (
+                <div className="flex justify-between py-1.5 border-b border-brand-borderSubtle">
+                  <span className="text-brand-muted">Click ID Atribuído:</span>
+                  <span className="text-white font-mono text-[11px]">{selectedEvent.clickId}</span>
+                </div>
+              )}
               <div className="flex justify-between py-1.5 border-b border-brand-borderSubtle">
-                <span className="text-brand-muted">Geolocalização:</span>
-                <span className="text-white">
-                  {selectedEvent.city}, {selectedEvent.country} ({selectedEvent.countryCode})
+                <span className="text-brand-muted">Decisão de Roteamento:</span>
+                <span className="text-white font-semibold">
+                  {selectedEvent.decision === "routed_offer"
+                    ? "OFERTA (Acesso Autorizado)"
+                    : selectedEvent.decision === "mitigated_safe"
+                    ? "SAFE PAGE (Verificação de Segurança)"
+                    : selectedEvent.isThreat
+                    ? "SAFE PAGE (Mitigado)"
+                    : "OFERTA (Liberado)"}
                 </span>
               </div>
+              <div className="flex justify-between py-1.5 border-b border-brand-borderSubtle">
+                <span className="text-brand-muted">Geolocalização:</span>
+                <span className="text-white flex items-center space-x-1.5">
+                  <span className="text-sm select-none">{getCountryFlag(selectedEvent.countryCode)}</span>
+                  <span>
+                    {selectedEvent.city}
+                    {selectedEvent.state ? `, ${selectedEvent.state}` : ""}
+                    {selectedEvent.stateCode ? ` [${selectedEvent.stateCode}]` : ""}
+                    {" — "}
+                    {selectedEvent.country}
+                  </span>
+                </span>
+              </div>
+              {selectedEvent.ispOrg && (
+                <div className="flex justify-between py-1.5 border-b border-brand-borderSubtle">
+                  <span className="text-brand-muted">Provedor / ISP:</span>
+                  <span className="text-white">{selectedEvent.ispOrg}</span>
+                </div>
+              )}
               <div className="flex justify-between py-1.5 border-b border-brand-borderSubtle">
                 <span className="text-brand-muted">Coordenadas Aprox.:</span>
                 <span className="text-white">

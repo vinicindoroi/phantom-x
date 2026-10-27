@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Header } from "@/components/dashboard/Header";
 import { DigitalMatrixWorldMap } from "@/components/dashboard/DigitalMatrixWorldMap";
 import { store } from "@/lib/store";
+import { getCountryFlag } from "@/lib/geoFlags";
 import { Globe2, Radio, Server } from "lucide-react";
 
 export default function GlobalMapPage() {
@@ -83,7 +84,12 @@ export default function GlobalMapPage() {
                           setSelectedCountry(selectedCountry === g.countryCode ? null : g.countryCode)
                         }
                       >
-                        <td className="py-2.5 text-white font-medium">{g.country}</td>
+                        <td className="py-2.5 text-white font-medium flex items-center space-x-2">
+                          <span className="text-base leading-none select-none">
+                            {getCountryFlag(g.countryCode)}
+                          </span>
+                          <span>{g.country}</span>
+                        </td>
                         <td className="py-2.5 text-brand-secondary">{g.countryCode}</td>
                         <td className="py-2.5 text-white font-bold">{g.eventsCount}</td>
                         <td className="py-2.5">
