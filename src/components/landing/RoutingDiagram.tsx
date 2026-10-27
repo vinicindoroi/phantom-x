@@ -17,15 +17,15 @@ export const RoutingDiagram: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "human" | "bot">("all");
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto py-8 px-4 select-none font-sans">
+    <div className="relative w-full max-w-5xl mx-auto py-8 px-3 sm:px-4 select-none font-sans">
       {/* Outer Obsidian Frame with Ambient Glow */}
-      <div className="relative rounded-3xl bg-gradient-to-b from-[#12141c]/90 via-[#0a0c10]/95 to-[#020203] border border-white/10 p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden ring-1 ring-white/5">
+      <div className="relative rounded-3xl bg-gradient-to-b from-[#12141c]/90 via-[#0a0c10]/95 to-[#020203] border border-white/10 p-4 sm:p-6 md:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden ring-1 ring-white/5">
         {/* Subtle Ambient Background Gradients */}
         <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-40 bg-white/[0.04] rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 left-1/4 w-80 h-40 bg-white/[0.03] rounded-full blur-3xl pointer-events-none" />
 
         {/* Header HUD / Ingress Bar */}
-        <div className="flex flex-wrap items-center justify-between pb-6 border-b border-white/10 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-white/10 gap-3">
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-mono text-white">
               <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
@@ -37,10 +37,10 @@ export const RoutingDiagram: React.FC = () => {
           </div>
 
           {/* Filter Pills */}
-          <div className="flex items-center space-x-1.5 bg-black/60 border border-white/10 p-1 rounded-xl text-xs font-mono">
+          <div className="flex items-center space-x-1 sm:space-x-1.5 bg-black/60 border border-white/10 p-1 rounded-xl text-[11px] sm:text-xs font-mono overflow-x-auto max-w-full">
             <button
               onClick={() => setActiveTab("all")}
-              className={`px-3 py-1 rounded-lg transition ${
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition whitespace-nowrap ${
                 activeTab === "all"
                   ? "bg-white text-black font-semibold shadow-sm"
                   : "text-brand-muted hover:text-white"
@@ -50,7 +50,7 @@ export const RoutingDiagram: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab("human")}
-              className={`px-3 py-1 rounded-lg transition flex items-center space-x-1 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition flex items-center space-x-1 whitespace-nowrap ${
                 activeTab === "human"
                   ? "bg-white text-black font-semibold shadow-sm"
                   : "text-brand-muted hover:text-white"
@@ -60,7 +60,7 @@ export const RoutingDiagram: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab("bot")}
-              className={`px-3 py-1 rounded-lg transition flex items-center space-x-1 ${
+              className={`px-2.5 sm:px-3 py-1 rounded-lg transition flex items-center space-x-1 whitespace-nowrap ${
                 activeTab === "bot"
                   ? "bg-white text-black font-semibold shadow-sm"
                   : "text-brand-muted hover:text-white"
@@ -287,8 +287,18 @@ export const RoutingDiagram: React.FC = () => {
               </div>
             </div>
 
+            {/* Mobile Vertical Conduit: Stage 1 -> Stage 2 */}
+            <div className="flex lg:hidden justify-center items-center -my-2 select-none">
+              <div className="flex flex-col items-center">
+                <div className="w-0.5 h-5 bg-gradient-to-b from-white/20 via-white to-white/20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-white/90 animate-pulse" />
+                </div>
+                <div className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_white]" />
+              </div>
+            </div>
+
             {/* STAGE 2: PHANTOM-X CORE PROCESSOR (Center 6 cols) */}
-            <div className="lg:col-span-6 relative flex flex-col items-center justify-center p-6 rounded-3xl bg-black/60 border border-white/15 shadow-inner">
+            <div className="lg:col-span-6 relative flex flex-col items-center justify-center p-4 sm:p-6 rounded-3xl bg-black/60 border border-white/15 shadow-inner">
               {/* Conectores Físicos de Entrada e Saída no Centro */}
               <div className="hidden lg:block absolute -left-2.5 top-[35%] -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white border-2 border-[#0c0e14] shadow-[0_0_8px_white] z-30" />
               <div className="hidden lg:block absolute -left-2.5 top-[65%] -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-neutral-400 border-2 border-[#0c0e14] shadow-[0_0_6px_rgba(255,255,255,0.4)] z-30" />
@@ -317,22 +327,32 @@ export const RoutingDiagram: React.FC = () => {
               </div>
 
               {/* Live Real-Time Telemetry Tags */}
-              <div className="relative z-10 mt-4 grid grid-cols-2 gap-2 w-full max-w-sm text-[11px] font-mono">
-                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+              <div className="relative z-10 mt-4 grid grid-cols-2 gap-2 w-full max-w-sm text-[10px] sm:text-[11px] font-mono">
+                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-1.5 sm:space-x-2">
                   <Fingerprint className="w-3.5 h-3.5 text-white shrink-0" />
                   <span className="text-brand-secondary truncate">Click ID Assinado</span>
                 </div>
-                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-1.5 sm:space-x-2">
                   <Zap className="w-3.5 h-3.5 text-white shrink-0" />
                   <span className="text-brand-secondary truncate">Latência &lt; 18ms</span>
                 </div>
-                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-1.5 sm:space-x-2">
                   <Cpu className="w-3.5 h-3.5 text-white shrink-0" />
                   <span className="text-brand-secondary truncate">ASN IP Filtering</span>
                 </div>
-                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-2">
+                <div className="p-2 rounded-xl bg-white/[0.04] border border-white/10 flex items-center space-x-1.5 sm:space-x-2">
                   <Lock className="w-3.5 h-3.5 text-white shrink-0" />
                   <span className="text-brand-secondary truncate">Anti-Open Redirect</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Vertical Conduit: Stage 2 -> Stage 3 */}
+            <div className="flex lg:hidden justify-center items-center -my-2 select-none">
+              <div className="flex flex-col items-center">
+                <div className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_8px_white]" />
+                <div className="w-0.5 h-5 bg-gradient-to-b from-white/20 via-white to-white/20 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-white/90 animate-pulse" />
                 </div>
               </div>
             </div>

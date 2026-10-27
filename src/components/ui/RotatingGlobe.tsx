@@ -240,18 +240,38 @@ export const RotatingGlobe: React.FC<RotatingGlobeProps> = ({
     isDraggingRef.current = false;
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      isDraggingRef.current = true;
+      dragStartRef.current = { x: e.touches[0].clientX, angle: angleRef.current };
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDraggingRef.current || e.touches.length !== 1) return;
+    const dx = e.touches[0].clientX - dragStartRef.current.x;
+    angleRef.current = dragStartRef.current.angle + dx * 0.008;
+  };
+
+  const handleTouchEnd = () => {
+    isDraggingRef.current = false;
+  };
+
   return (
     <div
-      className={`relative flex items-center justify-center select-none cursor-grab active:cursor-grabbing ${className}`}
+      className={`relative flex items-center justify-center select-none cursor-grab active:cursor-grabbing max-w-full ${className}`}
       style={{ width: size, height: size }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <canvas
         ref={canvasRef}
-        style={{ width: size, height: size }}
+        style={{ width: "100%", height: "100%", maxWidth: size, maxHeight: size }}
         className="block"
       />
     </div>
