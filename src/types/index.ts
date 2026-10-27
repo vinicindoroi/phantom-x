@@ -1,0 +1,140 @@
+export type DeviceType = "desktop" | "mobile" | "tablet" | "bot";
+export type RiskCategory = "clean" | "suspicious" | "bot";
+export type DomainStatus = "active" | "pending_verification" | "unverified";
+export type SSLStatus = "valid" | "provisioning" | "expired";
+export type CampaignStatus = "active" | "paused";
+export type RuleStatus = "active" | "inactive";
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: "admin" | "member" | "viewer";
+  organizationId: string;
+  organizationName: string;
+  createdAt: string;
+}
+
+export interface Organization {
+  id: string;
+  name: string;
+  planId: string;
+  apiKeys: ApiKey[];
+  createdAt: string;
+}
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  createdAt: string;
+  lastUsedAt?: string;
+}
+
+export interface Domain {
+  id: string;
+  name: string;
+  status: DomainStatus;
+  sslStatus: SSLStatus;
+  dnsRecords: {
+    type: "CNAME" | "A" | "TXT";
+    host: string;
+    expected: string;
+    verified: boolean;
+  }[];
+  eventsCount: number;
+  activeCampaigns: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  domainId: string;
+  domainName: string;
+  status: CampaignStatus;
+  targetUrl: string;
+  fallbackUrl?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmTerm?: string;
+  utmContent?: string;
+  routingRuleId?: string;
+  totalEvents: number;
+  cleanEvents: number;
+  botEvents: number;
+  conversionRate: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TrafficEvent {
+  id: string;
+  timestamp: string;
+  domain: string;
+  campaignId?: string;
+  campaignName?: string;
+  ip: string;
+  ipMasked: string;
+  country: string;
+  countryCode: string;
+  city: string;
+  latitude: number;
+  longitude: number;
+  device: DeviceType;
+  browser: string;
+  os: string;
+  referrer: string;
+  targetUrl: string;
+  routedTo: string;
+  riskScore: number; // 0 to 100
+  riskCategory: RiskCategory;
+  latencyMs: number;
+  isThreat: boolean;
+  threatReasons?: string[];
+}
+
+export interface RoutingRule {
+  id: string;
+  name: string;
+  domainId: string;
+  domainName: string;
+  priority: number;
+  status: RuleStatus;
+  conditions: {
+    countryCodes?: string[];
+    devices?: DeviceType[];
+    languages?: string[];
+    pathPattern?: string;
+    maxRiskScore?: number;
+  };
+  destinationUrl: string;
+  fallbackUrl: string;
+  hitsCount: number;
+  createdAt: string;
+}
+
+export interface MetricOverview {
+  activeVisitors: number;
+  totalEvents: number;
+  sessionCount: number;
+  uniqueCountries: number;
+  automatedThreatsBlocked: number;
+  periodGrowth: {
+    visitors: number;
+    events: number;
+    sessions: number;
+    threats: number;
+  };
+}
+
+export interface GeoAggregate {
+  country: string;
+  countryCode: string;
+  eventsCount: number;
+  percentage: number;
+  latitude: number;
+  longitude: number;
+}
